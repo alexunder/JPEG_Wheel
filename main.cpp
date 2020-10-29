@@ -72,7 +72,7 @@ void dumpBitmapInfoHead(BITMAPINFOHEADER * head) {
 int main(int, char**) {
     cout << "Hello, Bitmap!\n" << endl;
 
-    FILE *pf = fopen("sample_1280×853.bmp", "rb");
+    FILE *pf = fopen("../images/sample_1920_1280.bmp", "rb");
     if (pf == nullptr) {
         fprintf(stderr, "Open file failed.\n");
         return 1;
@@ -85,7 +85,7 @@ int main(int, char**) {
     dumpBitmapFileHead(&(bmpfile.bfHeader));
 
     fread(&(bmpfile.biInfo.bmiHeader), sizeof(BITMAPINFOHEADER), 1, pf);
-   
+
     dumpBitmapInfoHead(&(bmpfile.biInfo.bmiHeader));
 
     fclose(pf);
