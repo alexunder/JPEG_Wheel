@@ -7,4 +7,4 @@ set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
 
 set(CMAKE_BUILD_TYPE Debug)
 
-add_executable(JPEG_Wheel main.cpp)
+add_executable(JPEG_Wheel src/main.cpp)
