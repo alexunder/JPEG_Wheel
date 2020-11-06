@@ -28,12 +28,9 @@ void dumpBitmapInfoHead(BITMAPINFOHEADER * head) {
     cout << "biClrImportant=" << head->biClrImportant << endl;
 }
 
-class bitmap_test : public testing::Test
-{
+class bitmap_test : public testing::Test {};
 
-};
-
-TEST_F(bitmap_test, basic_test)
+TEST(bitmap_test, basic_test)
 {
     cout << "Hello, Bitmap!\n" << endl;
 
@@ -53,5 +50,46 @@ TEST_F(bitmap_test, basic_test)
 
     dumpBitmapInfoHead(&(bmpfile.biInfo.bmiHeader));
 
+    fclose(pf);
+}
+
+TEST(bitmap_test, rawdata_process)
+{
+    FILE *pf = fopen("../images/sample_1920_1280.bmp", "rb");
+    if (pf == nullptr) {
+        fprintf(stderr, "Open file failed.\n");
+        return;
+    }
+
+    BITMAPFILE bmpfile;
+    fread(&(bmpfile.bfHeader), sizeof(BITMAP_FILEHEADER), 1, pf);
+
+    fread(&(bmpfile.biInfo.bmiHeader), sizeof(BITMAPINFOHEADER), 1, pf);
+
+    int width  = bmpfile.biInfo.bmiHeader.biWidth;
+    int height = bmpfile.biInfo.bmiHeader.biHeight;
+    int pixelBytes = bmpfile.biInfo.bmiHeader.biBitCount / 8;
+    int rawDataSize = width * height * pixelBytes;
+
+    cout << "width=" << width << endl;
+    cout << "height=" << height << endl;
+    cout << "pixelBytes=" << pixelBytes << endl;
+    cout << "rawDataSize=" << rawDataSize << endl;
+
+    EXPECT_EQ(rawDataSize, bmpfile.biInfo.bmiHeader.biSizeImage);
+
+    int ret = fseek(pf, bmpfile.bfHeader.BitsOffset, SEEK_SET);
+    if (ret != 0) {
+        perror("fseek errror:");
+        fclose(pf);
+        return;
+    }
+
+    uint8_t * pRawData = (uint8_t *)malloc(rawDataSize*sizeof(uint8_t));
+
+    size_t cntRead = fread(pRawData , sizeof(uint8_t), rawDataSize, pf);
+    EXPECT_EQ(cntRead, rawDataSize);
+
+    free(pRawData);
     fclose(pf);
 }
